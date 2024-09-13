@@ -1,7 +1,9 @@
 package com.parkingspace.park.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -18,9 +20,14 @@ public class Parking {
     String price;
     String distance;
     int numberOfSpots;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "parking_fk")
-    List<SpotsAvailableModel> spotAvailable;
+   @OneToMany(mappedBy = "parking", orphanRemoval = true,cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  // @JoinColumn(name = "parking_fk")
+   @JsonManagedReference
+    List<SpotsAvailableModel> spotAvailable =new ArrayList<>();
+
+   @OneToMany(cascade = CascadeType.ALL)
+     @JoinColumn(name ="rvpk_Fk")
+    List<ReviewParking>reviewParking=new ArrayList<>();
 
 
     //work to do about coordinates
@@ -30,6 +37,7 @@ public class Parking {
     List<GalleryImages> gallery;
 
 
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "parking_fk")
     List<Amenities> amenities;
@@ -37,15 +45,18 @@ public class Parking {
     public Parking() {
     }
 
-    public Parking(Long id, String name, String description, String location, String price, String distance, int numberOfSpots, List<SpotsAvailableModel> spotAvailable, String coordinates, List<GalleryImages> gallery, List<Amenities> amenities) {
-        this.id = id;
+
+
+    public Parking( String name, String description, String location, String price, String distance, int numberOfSpots, String coordinates, List<GalleryImages> gallery, List<Amenities> amenities) {
+       // this.id = id;
         this.name = name;
         this.description = description;
         this.location = location;
         this.price = price;
         this.distance = distance;
         this.numberOfSpots = numberOfSpots;
-        this.spotAvailable = spotAvailable;
+        //this.spotAvailable = spotAvailable;
+
         this.coordinates = coordinates;
         this.gallery = gallery;
         this.amenities = amenities;
@@ -138,6 +149,14 @@ public class Parking {
 
     public void setAmenities(List<Amenities> amenities) {
         this.amenities = amenities;
+    }
+
+    public List<ReviewParking> getReviewParking() {
+        return reviewParking;
+    }
+
+    public void setReviewParking(List<ReviewParking> reviewParking) {
+        this.reviewParking = reviewParking;
     }
 
     @Override

@@ -21,6 +21,20 @@ public class ParkingController {
 
     @GetMapping("/all")
     public  List<Parking> getAllParkingSPots(){
+      List<Parking> parkingList = parkingServices.getAllParking();
+        for (Parking p : parkingList){
+
+           List <SpotsAvailableModel> s = p.getSpotAvailable();
+            System.out.println("this the hello world test now ..........hello..."+parkingList.size());
+
+            for(SpotsAvailableModel spotsAvailableModel : s){
+
+           }
+
+        }
+        System.out.println("this the hello world test now .............");
+
+
         return  parkingServices.getAllParking();
     }
 
@@ -29,18 +43,29 @@ public class ParkingController {
         parkingSpot =parkingServices.saveParking(saveParkingSpot);
         return parkingSpot;
     }
-    @PutMapping ("/update/{id}/{spotId}")
-    public ResponseEntity<Parking> update (@RequestBody Parking parking, @PathVariable Long id,@PathVariable Long spotId){
-        Parking updatedParking = parkingServices.updateParking(parking, id, spotId);
-        System.out.println("am checking something here please"+ updatedParking);
-
+    @PutMapping ("/update/{id}")
+    public ResponseEntity<Parking> update (@RequestBody Parking parking, @PathVariable Long id){
+        Parking updatedParking = parkingServices.updateParking(parking, id);
         return  ResponseEntity.ok().body(updatedParking);
     }
 
-    @PutMapping("updateSpot/{id}/{isAvailable}")
-    public void updateSpot (@PathVariable Long id,@PathVariable boolean isAvailable){
-        parkingServices.updateSpot(id,isAvailable);
+    @PutMapping("/updateSpot/{user_id}")
+    public void updateSpot (@RequestBody SpotsAvailableModel spotsAvailableModel,@PathVariable int user_id){
+        System.out.println("hello world"+spotsAvailableModel.getStartTime().toString());
+
+        parkingServices.updateSpot(user_id,spotsAvailableModel);
     }
+
+
+
+    @PutMapping("addreview/{parking_id}/{user_id}")
+    public ResponseEntity<Parking> addReview(@RequestBody Parking review, @PathVariable Long parking_id, @PathVariable int user_id ){
+        Parking park = parkingServices.addReview(review,parking_id,user_id);
+        System.out.println("am testing this code now ---------!!!!!!-");
+
+        return ResponseEntity.ok(park);
+
+    };
 
 
 

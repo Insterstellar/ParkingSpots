@@ -1,5 +1,6 @@
 package com.parkingspace.park.interfaces;
 
+import com.parkingspace.park.dtos.UserParkingDTO;
 import com.parkingspace.park.models.Parking;
 import com.parkingspace.park.models.UserParking;
 
@@ -11,5 +12,5 @@ public interface UserInterface {
    List<Parking> deleteFavorite(int user_id, Long parking_id);
 
     UserParking addUser(UserParking addUserParking);
-    List<UserParking> allUsers();
+    List<UserParkingDTO> allUsers();
 }

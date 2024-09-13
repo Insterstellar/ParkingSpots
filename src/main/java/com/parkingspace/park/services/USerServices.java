@@ -1,6 +1,10 @@
 package com.parkingspace.park.services;
 
+import com.parkingspace.park.dtos.ParkingDTO;
+import com.parkingspace.park.dtos.SpotsAvailableDTO;
+import com.parkingspace.park.dtos.UserParkingDTO;
 import com.parkingspace.park.interfaces.UserInterface;
+import com.parkingspace.park.models.SpotsAvailableModel;
 import com.parkingspace.park.models.UserParking;
 import com.parkingspace.park.models.Parking;
 import com.parkingspace.park.repository.UserRepository;
@@ -8,6 +12,7 @@ import com.parkingspace.park.repository.ParkingRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,10 +40,19 @@ public class USerServices implements UserInterface {
 
     @Override
     public List<Parking> getAllFavorites(int id) {
+        List<Parking> allFavorites = new ArrayList<>();
         UserParking userParking = userRepository.findById(id).orElse(null);
-        List<Parking> allFavorites= userParking.getParkingFavorites();
+
+
+         if(userParking !=null){
+             allFavorites= userParking.getParkingFavorites();
+             return allFavorites;
+         }
+         else {
+             return allFavorites;
+         }
         //userRepository.findAll();
-        return allFavorites;
+
     }
 
     @Override
@@ -60,7 +74,60 @@ public class USerServices implements UserInterface {
     }
 
     @Override
-    public List<UserParking> allUsers() {
-        return userRepository.findAll();
+    public List<UserParkingDTO> allUsers() {
+
+        List<UserParking> user=userRepository.findAll();
+        SpotsAvailableDTO spotsAvailableDTO = new SpotsAvailableDTO();
+        List<UserParkingDTO> userDto = new ArrayList<>();
+        for (UserParking userParking : user){
+            SpotsAvailableModel model = userParking.getBookedSpot();
+            spotsAvailableDTO.setId(model.getId());
+            spotsAvailableDTO.setDuration(model.getDuration());
+            spotsAvailableDTO.setEndTime(model.getEndTime());
+            spotsAvailableDTO.setStartTime(model.getStartTime());
+            spotsAvailableDTO.setOccupied(model.isIs_occupied());
+            spotsAvailableDTO.setTotalPrice(model.getTotalPrice());
+            spotsAvailableDTO.setQrCodeNumber(model.getQrCodeNumber());
+
+            Parking parking = model.getParking();
+            ParkingDTO parkingDTO = new ParkingDTO();
+
+            parkingDTO.setDescription(parking.getDescription());
+            parkingDTO.setDistance(parking.getDistance());
+            parkingDTO.setNumberOfSpots(parking.getNumberOfSpots());
+            parkingDTO.setLocation(parking.getLocation());
+            parkingDTO.setPrice(parking.getPrice());
+            parkingDTO.setName(parking.getName());
+            parkingDTO.setId(parking.getId());
+
+            spotsAvailableDTO.setParking(parkingDTO);
+
+
+
+        }
+
+       // List<UserParkingDTO> userDto1 = new ArrayList<>();
+           for(UserParking userParking : user){
+               UserParkingDTO userParkingDTO = new UserParkingDTO();
+               userParkingDTO.setUsername(userParking.getUsername());
+               userParkingDTO.setAdded(userParking.isAdded());
+               userParkingDTO.setBookedSpot(spotsAvailableDTO);
+               userParkingDTO.setId(userParking.getId());
+
+               userDto.add(userParkingDTO);
+
+
+              // userDto1.add(userParkingDTO);
+
+           // userParkingDTO.setUsername("#####hello world o to the world");
+
+
+    System.out.println("the parking for user 1 :-------------------------------+"+ userParkingDTO.toString());
+
+
+
+           }
+
+        return  userDto;
     }
 }

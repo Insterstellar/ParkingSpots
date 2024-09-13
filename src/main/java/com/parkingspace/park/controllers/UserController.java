@@ -1,8 +1,12 @@
 package com.parkingspace.park.controllers;
 
 
+import com.parkingspace.park.dtos.SpotsAvailableDTO;
+import com.parkingspace.park.dtos.UserParkingDTO;
 import com.parkingspace.park.models.Parking;
+import com.parkingspace.park.models.SpotsAvailableModel;
 import com.parkingspace.park.models.UserParking;
+import com.parkingspace.park.services.SpotsServices;
 import com.parkingspace.park.services.USerServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,8 @@ public class UserController {
 
     @Autowired
     USerServices userServices;
+    @Autowired
+    SpotsServices spotsServices;
     @PostMapping("/save/favorite/{userId}/{parkingId}")
     public UserParking saveFavorites(@PathVariable int userId, @PathVariable Long parkingId){
         return userServices.saveFavorites(parkingId, userId);
@@ -38,8 +44,31 @@ public class UserController {
         return userServices.deleteFavorite(user_id,parking_id);
     }
 
+
+
+
+
+    @GetMapping("activeNow")
+    public SpotsAvailableModel bookedSpot(@RequestBody SpotsAvailableModel activeSpot){
+        return  activeSpot;
+    }
+
+
+    //admin
     @GetMapping("/allusers")
-    public List<UserParking> allUsers(){
+    public List<UserParkingDTO> allUsers(){
        return  userServices.allUsers();
     }
+
+
+
+
+
+    //for test purposes. To be omitted later
+    @GetMapping("/allposts")
+    public List<SpotsAvailableDTO> allSSpots(){
+        return  spotsServices.allSpots();
+    }
+
+
 }
