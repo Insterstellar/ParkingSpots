@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -27,7 +28,11 @@ public class UserParking {
    SpotsAvailableModel bookedSpot;
    @OneToMany(cascade = CascadeType.ALL)
    @JoinColumn(name = "rs_fk")
-   List<SpotsAvailableModel> reservedSpot =new ArrayList<>();
+   Set<SpotsAvailableModel> reservedSpot ;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "bkhs_fk")
+   List<SpotsAvailableModel> bookHistory;
 
 
 
@@ -37,7 +42,7 @@ public class UserParking {
     public UserParking() {
     }
 
-    public UserParking(int id, String username, boolean isAdded, List<Parking> parkingFavorites, SpotsAvailableModel bookedSpot,List<SpotsAvailableModel> reservedSpot,String profileImage) {
+    public UserParking(int id, String username, boolean isAdded, List<Parking> parkingFavorites, SpotsAvailableModel bookedSpot,Set<SpotsAvailableModel> reservedSpot,String profileImage, List<SpotsAvailableModel> bookHistory) {
         this.id = id;
         this.username = username;
         this.isAdded = isAdded;
@@ -45,6 +50,7 @@ public class UserParking {
         this.bookedSpot = bookedSpot;
         this.reservedSpot=reservedSpot;
         this.profileImage=profileImage;
+        this.bookHistory = bookHistory;
     }
 
     public int getId() {
@@ -87,11 +93,11 @@ public class UserParking {
         this.bookedSpot = bookedSpot;
     }
 
-    public List<SpotsAvailableModel> getReservedSpot() {
+    public Set<SpotsAvailableModel> getReservedSpot() {
         return reservedSpot;
     }
 
-    public void setReservedSpot(List<SpotsAvailableModel> reservedSpot) {
+    public void setReservedSpot(Set<SpotsAvailableModel> reservedSpot) {
         this.reservedSpot = reservedSpot;
     }
 
@@ -101,5 +107,13 @@ public class UserParking {
 
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public List<SpotsAvailableModel> getBookHistory() {
+        return bookHistory;
+    }
+
+    public void setBookHistory(List<SpotsAvailableModel> bookHistory) {
+        this.bookHistory = bookHistory;
     }
 }

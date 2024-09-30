@@ -32,7 +32,7 @@ public class Parking {
 
     //work to do about coordinates
     String coordinates;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL )
     @JoinColumn(name = "parking_fk")
     List<GalleryImages> gallery;
 

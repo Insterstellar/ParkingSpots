@@ -80,17 +80,13 @@ public class ParkingServices implements ParkingInterface {
 
 
 
-
-
-
-
             return parkingRepo.save(parking);
         }
 
     }
 
     @Override
-    public Parking addReview(Parking review, Long parking_id, int user_id) {
+    public Parking addReview(ReviewParking review, Long parking_id, int user_id) {
         //  parking and user entities
         Parking oldReview = parkingRepo.findById(parking_id).orElse(null);
         UserParking userParking = userRepository.findById(user_id).orElse(null);
@@ -114,23 +110,21 @@ public class ParkingServices implements ParkingInterface {
 
 
         if (userExistingReview != null) {
-            List<ReviewParking> newReviewData = review.getReviewParking();
-            for (ReviewParking rp : newReviewData) {
-                userExistingReview.setComment(rp.getComment());
-                userExistingReview.setStars(rp.getStars());
+
+
+                userExistingReview.setComment(review.getComment());
+                userExistingReview.setStars(review.getStars());
                 //userExistingReview.setUserParkingName(userParking);
 
 
-            }
+
         } else {
 
             ReviewParking newReview = new ReviewParking();
-            List<ReviewParking> newReviewData = review.getReviewParking();
-            for (ReviewParking rp : newReviewData) {
-                newReview.setComment(rp.getComment());
-                newReview.setStars(rp.getStars());
+                newReview.setComment(review.getComment());
+                newReview.setStars(review.getStars());
                 newReview.setUserParkingName(userParking);
-            }
+
             existingReviews.add(newReview);
         }
 

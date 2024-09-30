@@ -7,13 +7,19 @@ import com.parkingspace.park.interfaces.UserInterface;
 import com.parkingspace.park.models.SpotsAvailableModel;
 import com.parkingspace.park.models.UserParking;
 import com.parkingspace.park.models.Parking;
+import com.parkingspace.park.repository.SpotsAvailableModelRepo;
 import com.parkingspace.park.repository.UserRepository;
 import com.parkingspace.park.repository.ParkingRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLOutput;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 public class USerServices implements UserInterface {
@@ -21,11 +27,15 @@ public class USerServices implements UserInterface {
     UserRepository userRepository;
     @Autowired
     ParkingRepo parkingRepo;
+
+    @Autowired
+   private SpotsAvailableModelRepo spotsAvailableModelRepo;
+    int seconds=0;
+    int newTime =0;
     @Override
     public UserParking saveFavorites(Long parkingId, int userId) {
         Parking parking = parkingRepo.findById(parkingId).orElse(null);
         UserParking userParking = userRepository.findById(userId).orElse(null);
-
 
 //TO_DO excpetions to be handled later
         List<Parking> parkingList = userParking.getParkingFavorites();
@@ -57,7 +67,7 @@ public class USerServices implements UserInterface {
 
     @Override
     public List<Parking> deleteFavorite(int user_id, Long parking_id) {
-       // Parking parkin=;
+
         UserParking userParking = userRepository.findById(user_id).orElse(null);
         Parking parking1 = parkingRepo.findById(parking_id).orElse(null);
         List<Parking> parking = userParking.getParkingFavorites();
@@ -116,12 +126,6 @@ public class USerServices implements UserInterface {
 
                userDto.add(userParkingDTO);
 
-
-              // userDto1.add(userParkingDTO);
-
-           // userParkingDTO.setUsername("#####hello world o to the world");
-
-
     System.out.println("the parking for user 1 :-------------------------------+"+ userParkingDTO.toString());
 
 
@@ -129,5 +133,301 @@ public class USerServices implements UserInterface {
            }
 
         return  userDto;
+    }
+
+    @Override
+    public UserParkingDTO activeSPot(int user_id) throws ExecutionException, InterruptedException {
+        UserParkingDTO userParkingDTO = new UserParkingDTO();
+
+        UserParking activeSpot = userRepository.findById(user_id).orElse(null);
+        SpotsAvailableModel spotsAvailableModel = activeSpot.getBookedSpot();
+
+
+       //int newTimae= times(spotsAvailableModel.getDuration());
+        if(activeSpot!=null && spotsAvailableModel!=null){
+            LocalDateTime startdate =spotsAvailableModel.getStartTime();
+            LocalDateTime enddate =spotsAvailableModel.getEndTime();
+            LocalTime endTime = LocalTime.of(enddate.getHour(), enddate.getMinute());
+            LocalTime currentTime = LocalTime.now();
+            LocalTime check = LocalTime.of(13,30);
+             //LocalTime checkfirst = LocalTime.of(1,21);
+
+            Duration remainingDuration = Duration.between(currentTime, endTime);
+
+
+           LocalTime remainingTime;
+            if(remainingDuration.isNegative()){
+                List<SpotsAvailableModel> addToHistory = new ArrayList<>();
+                addToHistory.add(spotsAvailableModel);
+                activeSpot.setBookHistory(addToHistory);
+                userRepository.save(activeSpot);
+                remainingTime=LocalTime.MIDNIGHT;
+                activeSpot.setBookedSpot(null);
+                userRepository.save(activeSpot);
+
+                System.out.println("------------time is less than 0   :"+remainingDuration.toHoursPart()+":"+remainingDuration.toMinutesPart()+ ":"+remainingDuration.toSecondsPart());
+
+            }else {
+              remainingTime = LocalTime.of((int)remainingDuration.toHours(),(int)remainingDuration.toMinutesPart(),(int)remainingDuration.toSecondsPart());
+
+                System.out.println("------------ postive   :"+remainingDuration.toHoursPart()+":"+remainingDuration.toMinutesPart()+ ":"+remainingDuration.toSecondsPart());
+
+            }
+
+
+
+
+             SpotsAvailableDTO spotsAvailableDTO =new SpotsAvailableDTO();
+             spotsAvailableDTO.setDuration(spotsAvailableModel.getDuration());
+             spotsAvailableDTO.setRemainingTime(remainingTime );
+             spotsAvailableDTO.setStartTime(spotsAvailableModel.getStartTime());
+             spotsAvailableDTO.setEndTime(spotsAvailableModel.getEndTime());
+             spotsAvailableDTO.setQrCodeNumber(spotsAvailableModel.getQrCodeNumber());
+             spotsAvailableDTO.setTotalPrice(spotsAvailableModel.getTotalPrice());
+             spotsAvailableDTO.setId(spotsAvailableModel.getId());
+
+             Parking parking = spotsAvailableModel.getParking();
+             ParkingDTO parkingDTO = new ParkingDTO();
+             parkingDTO.setName(parking.getName());
+             parkingDTO.setDescription(parking.getDescription());
+             parkingDTO.setPrice(parking.getPrice());
+             parkingDTO.setLocation(parking.getLocation());
+             parkingDTO.setDistance(parking.getDistance());
+             parkingDTO.setId(parking.getId());
+
+
+             spotsAvailableDTO.setParking(parkingDTO);
+            //userParking=activeSpot;
+            userParkingDTO.setUsername(activeSpot.getUsername());
+            userParkingDTO.setBookedSpot(spotsAvailableDTO);
+            userParkingDTO.setId(activeSpot.getId());
+            userParkingDTO.setProfileImage(activeSpot.getProfileImage());
+
+            return userParkingDTO;
+
+        }else {
+            System.out.println("this here-------" );
+
+            List<SpotsAvailableModel> tagg=activeSpot.getBookHistory();
+            for(SpotsAvailableModel walter : tagg){
+                System.out.println("this here-------"+ walter.getId() );
+            }
+
+            return userParkingDTO;
+        }
+
+    }
+
+    @Override
+    public void extendParkingTime(int user_id, SpotsAvailableModel extendTime) {
+        UserParking userParking =userRepository.findById(user_id).orElse(null);
+        LocalDateTime newExtendedTime = extendTime.getEndTime();
+
+        if(userParking !=null){
+           SpotsAvailableModel spotsAvailableModel=userParking.getBookedSpot();
+           LocalDateTime localDateTime = spotsAvailableModel.getEndTime()
+                   .plusHours(newExtendedTime.getHour())
+                   .plusMinutes(newExtendedTime.getMinute())
+                   .plusSeconds(newExtendedTime.getSecond());
+
+
+
+           spotsAvailableModel.setEndTime(localDateTime);
+           double newTotalPrice=userParking.getBookedSpot().getTotalPrice()+ extendTime.getTotalPrice();
+           spotsAvailableModel.setTotalPrice(newTotalPrice);
+
+           userParking.setBookedSpot(spotsAvailableModel);
+
+           userRepository.save(userParking);
+        }
+
+
+    }
+
+    @Override
+    public UserParkingDTO saveReservedSpots(int user_id, SpotsAvailableModel reservedSpots) {
+        UserParkingDTO emptyDto = new UserParkingDTO();
+
+        UserParking userParking = userRepository.findById(user_id).orElse(null);
+        SpotsAvailableModel updateModel = spotsAvailableModelRepo.findById(reservedSpots.getId()).orElse(null);
+        if(userParking!=null && updateModel !=null){
+
+            updateModel.setTotalPrice(reservedSpots.getTotalPrice());
+            //updateModel.setParking(reservedSpots.getParking());
+            updateModel.setQrCodeNumber(reservedSpots.getQrCodeNumber());
+            updateModel.setDuration(reservedSpots.getDuration());
+            updateModel.setStartTime(reservedSpots.getStartTime());
+            updateModel.setEndTime(reservedSpots.getEndTime());
+
+
+            Set<SpotsAvailableModel> reservedSpotList = userParking.getReservedSpot();
+
+                reservedSpotList.remove(updateModel);
+                reservedSpotList.add(updateModel);
+
+
+
+            userParking.setReservedSpot(reservedSpotList);
+
+            userRepository.save(userParking);
+
+
+            Set<SpotsAvailableModel> spotsList = userParking.getReservedSpot();
+            List<SpotsAvailableDTO> spotsAvailableDTOS =new ArrayList<>();
+            for(SpotsAvailableModel updateList : spotsList){
+                SpotsAvailableDTO availableDTO = new SpotsAvailableDTO();
+
+                availableDTO.setTotalPrice(updateList.getTotalPrice());
+                availableDTO.setStartTime(updateList.getStartTime());
+                availableDTO.setEndTime(updateList.getEndTime());
+                availableDTO.setQrCodeNumber(updateList.getQrCodeNumber());
+                availableDTO.setId(updateList.getId());
+
+                Parking parking = updateList.getParking();
+
+                ParkingDTO parkingDTO = new ParkingDTO();
+                parkingDTO.setId(parking.getId());
+                parkingDTO.setPrice(parking.getPrice());
+                parkingDTO.setName(parking.getName());
+                parkingDTO.setLocation(parking.getLocation());
+                parkingDTO.setDescription(parking.getDescription());
+
+                availableDTO.setParking(parkingDTO);
+                spotsAvailableDTOS.add(availableDTO);
+
+            }
+
+            UserParkingDTO userParkingDTO = new UserParkingDTO();
+
+            userParkingDTO.setUsername(userParking.getUsername());
+            userParkingDTO.setProfileImage(userParking.getProfileImage());
+            userParkingDTO.setReservedParking(spotsAvailableDTOS);
+
+return  userParkingDTO;
+
+        }
+        return emptyDto ;
+    }
+
+    @Override
+    public UserParkingDTO allReservedSpots(int user_id)  {
+    UserParkingDTO userParkingLIst = new UserParkingDTO();
+
+        UserParking reservedSpot =userRepository.findById(user_id).orElse(null);
+        if(reservedSpot!=null){
+            Set<SpotsAvailableModel> reservedSpots= reservedSpot.getReservedSpot();
+
+
+            System.out.println("he≤re ids the new list"+reservedSpots.size());
+            List<SpotsAvailableDTO> spotsAvailableDTOList = new ArrayList<>();
+
+            for(SpotsAvailableModel newReserved : reservedSpots){
+                SpotsAvailableDTO spotsAvailableDTO = new SpotsAvailableDTO();
+                spotsAvailableDTO.setId(newReserved.getId());
+                spotsAvailableDTO.setRemainingTime(null);
+                spotsAvailableDTO.setTotalPrice(newReserved.getTotalPrice());
+                spotsAvailableDTO.setQrCodeNumber(newReserved.getQrCodeNumber());
+                spotsAvailableDTO.setStartTime(newReserved.getStartTime());
+                spotsAvailableDTO.setEndTime(newReserved.getEndTime());
+                spotsAvailableDTO.setDuration(newReserved.getDuration());
+
+                Parking parking =newReserved.getParking();
+                ParkingDTO parkingDTO = new ParkingDTO();
+                parkingDTO.setId(parking.getId());
+                parkingDTO.setName(parking.getName());
+                parkingDTO.setLocation(parking.getLocation());
+                parkingDTO.setPrice(parking.getPrice());
+
+                spotsAvailableDTO.setParking(parkingDTO);
+
+                spotsAvailableDTOList.add(spotsAvailableDTO);
+
+            }
+            UserParkingDTO userParkingDTO = new UserParkingDTO();
+
+            userParkingDTO.setUsername(reservedSpot.getUsername());
+            userParkingDTO.setId(reservedSpot.getId());
+            userParkingDTO.setProfileImage(reservedSpot.getProfileImage());
+            userParkingDTO.setReservedParking(spotsAvailableDTOList);
+
+            userParkingLIst =userParkingDTO;
+
+
+                UserParking allReservedSpots = userRepository.findById(user_id).orElse(null);
+
+               Set<SpotsAvailableModel> list = allReservedSpots.getReservedSpot();
+
+              for(SpotsAvailableModel spotsAvailableModel : list){
+                   LocalDateTime localDateTime =spotsAvailableModel.getStartTime();
+
+                   Date delayTime = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+                  Timer timer = new Timer();
+                  timer.schedule(new TimerTask() {
+                      @Override
+                      public void run() {
+                          try {
+                              Thread.sleep(1000l);
+                              reservedSpot.setBookedSpot(spotsAvailableModel);
+                              userRepository.save(reservedSpot);
+                          } catch (InterruptedException e) {
+                              throw new RuntimeException(e);
+                          }
+
+                       list.remove(spotsAvailableModel);
+
+                        userRepository.save(allReservedSpots);
+
+                      }
+                  },delayTime);
+               }
+
+            return userParkingLIst;
+
+        }else {
+
+            return userParkingLIst;
+
+        }
+
+    }
+
+
+    public static CompletableFuture<LocalTime> times(LocalTime timeDuration)   {
+
+        CompletableFuture<LocalTime> future = new CompletableFuture<>();
+
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        // Runnable task to run every second
+        Runnable countdownTask = new Runnable() {
+            LocalTime currentTime = timeDuration;
+
+
+            @Override
+            public void run() {
+
+                if (!currentTime.equals(LocalTime.MIDNIGHT)) { // Stop when time reaches 00:00:00
+                    System.out.println("Time remaining: " + currentTime);
+                    currentTime = currentTime.minusSeconds(1);
+                    future.complete(currentTime);// Subtract one second from the time
+
+                } else {
+                    System.out.println("Countdown complete!");
+                    scheduler.shutdown(); // Stop the scheduler when countdown reaches zero
+                }
+            }
+
+        };
+
+
+
+        // Schedule the countdown task to run every second
+       scheduler.scheduleAtFixedRate(countdownTask, 0, 1, TimeUnit.SECONDS);
+
+
+
+        return future;
+
     }
 }

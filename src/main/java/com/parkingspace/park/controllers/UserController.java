@@ -13,10 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
+
+    UserParkingDTO userParkingDTOList ;
 
     @Autowired
     USerServices userServices;
@@ -45,9 +48,6 @@ public class UserController {
     }
 
 
-
-
-
     @GetMapping("activeNow")
     public SpotsAvailableModel bookedSpot(@RequestBody SpotsAvailableModel activeSpot){
         return  activeSpot;
@@ -60,14 +60,41 @@ public class UserController {
        return  userServices.allUsers();
     }
 
-
-
-
-
-    //for test purposes. To be omitted later
+    //for Tile purposes. To be omitted later
     @GetMapping("/allposts")
     public List<SpotsAvailableDTO> allSSpots(){
         return  spotsServices.allSpots();
+    }
+
+
+    @GetMapping("activespot/{user_id}")
+    public ResponseEntity<UserParkingDTO> activeSpot(@PathVariable int user_id) throws ExecutionException, InterruptedException {
+        return  ResponseEntity.ok(userServices.activeSPot(user_id));
+    }
+    @PatchMapping("/extendTime/{user_id}")
+    public ResponseEntity<String> extendedParkingTome(@PathVariable int user_id, @RequestBody SpotsAvailableModel extendedTime){
+        userServices.extendParkingTime(user_id,extendedTime);
+
+        return ResponseEntity.ok("succeeded");
+    }
+
+
+    @GetMapping("/allReserved/{user_id}")
+    public ResponseEntity<UserParkingDTO>allReservedSpots(@PathVariable int user_id){
+       UserParkingDTO userParkingDTO=  userServices.allReservedSpots(user_id);
+
+       if(userParkingDTO!=null){
+           return  ResponseEntity.ok(userParkingDTO);
+       }
+
+       return  ResponseEntity.ok(userParkingDTO);
+
+    }
+
+    @PostMapping("/saveReservedSpot/{user_id}")
+    public ResponseEntity <UserParkingDTO> saveReservedSPot(@PathVariable int user_id, @RequestBody SpotsAvailableModel spotsAvailableModel){
+        UserParkingDTO  userParking= userServices.saveReservedSpots(user_id,spotsAvailableModel);
+        return ResponseEntity.ok(userParking);
     }
 
 

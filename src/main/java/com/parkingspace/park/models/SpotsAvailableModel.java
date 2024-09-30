@@ -101,4 +101,18 @@ public class SpotsAvailableModel {
     public void setQrCodeNumber(double qrCodeNumber) {
         this.qrCodeNumber = qrCodeNumber;
     }
+
+    @Override
+    public String toString() {
+        return "SpotsAvailableModel{" +
+                "id=" + id +
+                ", is_occupied=" + is_occupied +
+                ", duration=" + duration +
+                ", totalPrice=" + totalPrice +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", parking=" + parking +
+                ", qrCodeNumber=" + qrCodeNumber +
+                '}';
+    }
 }

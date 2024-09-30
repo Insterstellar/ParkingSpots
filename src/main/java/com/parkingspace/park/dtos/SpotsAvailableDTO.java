@@ -1,11 +1,13 @@
 package com.parkingspace.park.dtos;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class SpotsAvailableDTO {
     private Long id;
     private boolean isOccupied;
     private int duration;
+    private LocalTime remainingTime;
     private double totalPrice;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -76,6 +78,14 @@ public class SpotsAvailableDTO {
 
     public double getQrCodeNumber() {
         return qrCodeNumber;
+    }
+
+    public  LocalTime getRemainingTime() {
+        return remainingTime;
+    }
+
+    public void setRemainingTime( LocalTime remainingTime) {
+        this.remainingTime = remainingTime;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.parkingspace.park.controllers;
 
 
 import com.parkingspace.park.models.Parking;
+import com.parkingspace.park.models.ReviewParking;
 import com.parkingspace.park.models.SpotsAvailableModel;
 import com.parkingspace.park.services.ParkingServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,14 @@ public class ParkingController {
         for (Parking p : parkingList){
 
            List <SpotsAvailableModel> s = p.getSpotAvailable();
-            System.out.println("this the hello world test now ..........hello..."+parkingList.size());
+            System.out.println("this the hello world Tile now ..........hello..."+parkingList.size());
 
             for(SpotsAvailableModel spotsAvailableModel : s){
 
            }
 
         }
-        System.out.println("this the hello world test now .............");
+        System.out.println("this the hello world Tile now .............");
 
 
         return  parkingServices.getAllParking();
@@ -58,10 +59,11 @@ public class ParkingController {
 
 
 
-    @PutMapping("addreview/{parking_id}/{user_id}")
-    public ResponseEntity<Parking> addReview(@RequestBody Parking review, @PathVariable Long parking_id, @PathVariable int user_id ){
+    @PatchMapping("/addreview/{parking_id}/{user_id}")
+    public ResponseEntity<Parking> addReview(@RequestBody ReviewParking review, @PathVariable Long parking_id, @PathVariable int user_id ){
+        System.out.println("am testing this code now ---------!!!!!!-"+review.getComment());
+
         Parking park = parkingServices.addReview(review,parking_id,user_id);
-        System.out.println("am testing this code now ---------!!!!!!-");
 
         return ResponseEntity.ok(park);
 

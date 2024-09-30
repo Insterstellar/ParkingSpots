@@ -8,6 +8,7 @@ public class ParkingDTO {
     private String price;
     private String distance;
     private int numberOfSpots;
+    String coordinates;
 
     // Getters and setters
 

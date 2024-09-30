@@ -1,12 +1,15 @@
 package com.parkingspace.park.dtos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserParkingDTO {
     private int id;
     private String username;
+    String profileImage;
     private boolean isAdded;
     private List<ParkingDTO> parkingFavorites;
+    private List<SpotsAvailableDTO> reservedParking =new ArrayList<>();
     private SpotsAvailableDTO bookedSpot;
 
     public int getId() {
@@ -19,6 +22,14 @@ public class UserParkingDTO {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public void setUsername(String username) {
@@ -47,6 +58,14 @@ public class UserParkingDTO {
 
     public void setBookedSpot(SpotsAvailableDTO bookedSpot) {
         this.bookedSpot = bookedSpot;
+    }
+
+    public List<SpotsAvailableDTO> getReservedParking() {
+        return reservedParking;
+    }
+
+    public void setReservedParking(List<SpotsAvailableDTO> reservedParking) {
+        this.reservedParking = reservedParking;
     }
 
     @Override
