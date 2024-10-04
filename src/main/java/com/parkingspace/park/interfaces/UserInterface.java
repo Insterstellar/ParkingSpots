@@ -24,5 +24,6 @@ public interface UserInterface {
 
    UserParkingDTO allReservedSpots(int user_id);
 
+   UserParkingDTO allHistory(int user_id);
 
 }

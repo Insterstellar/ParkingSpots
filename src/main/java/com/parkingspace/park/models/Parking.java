@@ -2,6 +2,8 @@ package com.parkingspace.park.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,8 @@ public class Parking {
     List<SpotsAvailableModel> spotAvailable =new ArrayList<>();
 
    @OneToMany(cascade = CascadeType.ALL)
-     @JoinColumn(name ="rvpk_Fk")
+   @OnDelete(action = OnDeleteAction.CASCADE)
+   @JoinColumn(name ="rvpk_Fk")
     List<ReviewParking>reviewParking=new ArrayList<>();
 
 

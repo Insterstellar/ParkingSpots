@@ -88,29 +88,29 @@ public class ParkingServices implements ParkingInterface {
     @Override
     public Parking addReview(ReviewParking review, Long parking_id, int user_id) {
         //  parking and user entities
-        Parking oldReview = parkingRepo.findById(parking_id).orElse(null);
+        Parking parkingReview = parkingRepo.findById(parking_id).orElse(null);
         UserParking userParking = userRepository.findById(user_id).orElse(null);
 
-        if (oldReview == null || userParking == null) {
+        if (parkingReview == null || userParking == null) {
 
             return null;
         }
 
 
-        List<ReviewParking> existingReviews = oldReview.getReviewParking();
+        List<ReviewParking> existingReviews = parkingReview.getReviewParking();
         ReviewParking userExistingReview = null;
 
 
         for (ReviewParking rp : existingReviews) {
             if (rp.getUserParkingName().getId() == user_id) {
                 userExistingReview = rp;
+
                 break;
             }
         }
 
 
         if (userExistingReview != null) {
-
 
                 userExistingReview.setComment(review.getComment());
                 userExistingReview.setStars(review.getStars());
@@ -119,9 +119,12 @@ public class ParkingServices implements ParkingInterface {
 
 
         } else {
+           // System.out.println("print one doesnt user exists---------------");
+
 
             ReviewParking newReview = new ReviewParking();
-                newReview.setComment(review.getComment());
+
+            newReview.setComment(review.getComment());
                 newReview.setStars(review.getStars());
                 newReview.setUserParkingName(userParking);
 
@@ -129,9 +132,9 @@ public class ParkingServices implements ParkingInterface {
         }
 
 
-        oldReview.setReviewParking(existingReviews);
+        parkingReview.setReviewParking(existingReviews);
 
-        return parkingRepo.save(oldReview);
+        return parkingRepo.save(parkingReview);
     }
 
     @Override

@@ -11,7 +11,7 @@ public class ReviewParking {
     int id ;
     String comment;
     int stars;
-    @OneToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_fk")
     UserParking userParkingName;
 

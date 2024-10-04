@@ -98,4 +98,12 @@ public class UserController {
     }
 
 
+    @GetMapping("/history/{user_id}")
+    public ResponseEntity<UserParkingDTO> allHistory(@PathVariable int user_id){
+        UserParkingDTO userParkingDTO =userServices.allHistory(user_id);
+    System.out.println("hellow"+userParkingDTO);
+    return ResponseEntity.ok(userParkingDTO);
+    }
+
+
 }

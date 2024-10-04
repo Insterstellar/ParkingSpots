@@ -1,5 +1,7 @@
 package com.parkingspace.park.dtos;
 
+import com.parkingspace.park.models.SpotsAvailableModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ public class UserParkingDTO {
     private List<ParkingDTO> parkingFavorites;
     private List<SpotsAvailableDTO> reservedParking =new ArrayList<>();
     private SpotsAvailableDTO bookedSpot;
+    List<SpotsAvailableDTO> bookHistory;
 
     public int getId() {
         return id;
@@ -66,6 +69,14 @@ public class UserParkingDTO {
 
     public void setReservedParking(List<SpotsAvailableDTO> reservedParking) {
         this.reservedParking = reservedParking;
+    }
+
+    public List<SpotsAvailableDTO> getBookHistory() {
+        return bookHistory;
+    }
+
+    public void setBookHistory(List<SpotsAvailableDTO> bookHistory) {
+        this.bookHistory = bookHistory;
     }
 
     @Override

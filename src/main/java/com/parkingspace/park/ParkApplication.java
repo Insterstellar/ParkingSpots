@@ -1,6 +1,7 @@
 package com.parkingspace.park;
 
 import com.parkingspace.park.controllers.ParkingController;
+import com.parkingspace.park.models.Amenities;
 import com.parkingspace.park.services.ParkingServices;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Timer;
 
 import static com.zaxxer.hikari.util.ClockSource.currentTime;
@@ -41,7 +44,16 @@ public class ParkApplication {
 		Date two = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
 
-		//System.out.println("hello world this is the begining of the world"+ two);
+Amenities am =new Amenities();
+    HashMap<String, Amenities> cars = new HashMap();
+		cars.put("on",new Amenities("mandy",1)) ;
+		cars.put("one",new Amenities("rons",1)) ;
+	//	cars.add(am);
+	//	cars.add(am);
+	//	cars.add(am);
+	//	cars.add(am);
+	//	System.out.println(cars.get("on").getName());
+
 
 		//timer.
 		//timer.schedule(myTaski,  two);

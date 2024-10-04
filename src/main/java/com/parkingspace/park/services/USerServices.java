@@ -391,6 +391,48 @@ return  userParkingDTO;
 
     }
 
+    @Override
+    public UserParkingDTO allHistory(int user_id) {
+        UserParkingDTO userParkingDTOS = new UserParkingDTO();
+        //to be refactored later and handle exceptions.
+        List<SpotsAvailableDTO> historyList =new ArrayList<>();
+        UserParking userHistory = userRepository.findById(user_id).orElse(null);
+
+        if(userHistory!=null){
+            List<SpotsAvailableModel> history =userHistory.getBookHistory();
+            for (SpotsAvailableModel model : history){
+          SpotsAvailableDTO availableDTO = new  SpotsAvailableDTO();
+
+                availableDTO.setTotalPrice(model.getTotalPrice());
+        availableDTO.setStartTime(model.getStartTime());
+        availableDTO.setEndTime(model.getEndTime());
+        availableDTO.setDuration(model.getDuration());
+                Parking parking = model.getParking();
+                ParkingDTO parkingDTO =new  ParkingDTO();
+        parkingDTO.setId(parking.getId());
+        parkingDTO.setPrice(parking.getPrice());
+        parkingDTO.setLocation(parking.getLocation());
+        parkingDTO.setName(parking.getName());
+
+        availableDTO.setParking(parkingDTO);
+                historyList.add(availableDTO);
+        userParkingDTOS.setUsername(userHistory.getUsername());
+                userParkingDTOS.setBookHistory(historyList);
+
+            }
+
+
+
+
+
+
+            return userParkingDTOS ;
+
+        }
+
+        return userParkingDTOS ;
+    }
+
 
     public static CompletableFuture<LocalTime> times(LocalTime timeDuration)   {
 

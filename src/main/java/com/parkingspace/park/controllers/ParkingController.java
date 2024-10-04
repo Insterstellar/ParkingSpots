@@ -61,7 +61,7 @@ public class ParkingController {
 
     @PatchMapping("/addreview/{parking_id}/{user_id}")
     public ResponseEntity<Parking> addReview(@RequestBody ReviewParking review, @PathVariable Long parking_id, @PathVariable int user_id ){
-        System.out.println("am testing this code now ---------!!!!!!-"+review.getComment());
+        System.out.println("print comment when added ---------!!!!!!-"+review.getComment());
 
         Parking park = parkingServices.addReview(review,parking_id,user_id);
 
